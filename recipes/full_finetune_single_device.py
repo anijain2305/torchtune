@@ -559,11 +559,15 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
         running_loss, num_tokens = 0.0, 0
         self._profiler.start()
 
+
         for curr_epoch in range(self.epochs_run, self.total_epochs):
             pbar = tqdm(total=self._steps_per_epoch)
             self._dataloader.sampler.set_epoch(curr_epoch)
 
             for idx, batch in enumerate(self._dataloader):
+                if idx == 10:
+                    t0_new = time.perf_counter()
+
                 # Optionally start memory profiling
                 if (
                     curr_epoch == 0
@@ -649,6 +653,8 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
                     break
 
             self.epochs_run += 1
+            t1_new = time.perf_counter()
+            print("Time = ", t1_new - t0_new)
             self.save_checkpoint(epoch=curr_epoch)
 
         self._profiler.stop()

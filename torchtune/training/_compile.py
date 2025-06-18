@@ -41,16 +41,26 @@ def compile_model(
     backend = os.environ.get("TORCH_COMPILE_BACKEND", "inductor")
     if isinstance(model, DeepFusionModel):
         model = model.decoder
+    
+    model.compile(backend=backend)
     # Per-layer compilation by default
-    if verbose:
-        log.info(
-            "Compiling model layers with torch.compile. Expect a relatively slower first step."
-        )
-    for m in reversed(list(model.modules())):
-        if isinstance(m, TransformerSelfAttentionLayer) or isinstance(
-            m, TransformerCrossAttentionLayer
-        ):
-            m.compile(backend=backend)
+    # if verbose:
+    #     log.info(
+    #         "Compiling model layers with torch.compile. Expect a relatively slower first step."
+    #     )
+    # for m in reversed(list(model.modules())):
+    #     if isinstance(m, TransformerSelfAttentionLayer) or isinstance(
+    #         m, TransformerCrossAttentionLayer
+    #     ):
+    #         m.compile(backend=backend)
+
+    # from torch._higher_order_ops.invoke_subgraph import mark_compile_region
+    # for m in reversed(list(model.modules())):
+    #     if isinstance(m, TransformerSelfAttentionLayer) or isinstance(
+    #         m, TransformerCrossAttentionLayer
+    #     ):
+    #         m.__class__.forward = mark_compile_region(m.__class__.forward)
+
 
 
 def compile_loss(loss: nn.Module, verbose: bool = True) -> nn.Module:
@@ -63,13 +73,13 @@ def compile_loss(loss: nn.Module, verbose: bool = True) -> nn.Module:
     Returns:
         loss (nn.Module): Compiled loss function
     """
-    backend = os.environ.get("TORCH_COMPILE_BACKEND", "inductor")
-    if verbose:
-        log.info("Compiling loss with torch.compile...")
+    # backend = os.environ.get("TORCH_COMPILE_BACKEND", "inductor")
+    # if verbose:
+    #     log.info("Compiling loss with torch.compile...")
 
-    if hasattr(loss, "apply_compile_strategy"):
-        loss = loss.apply_compile_strategy(backend=backend)
-    else:
-        loss = torch.compile(loss, backend=backend)
+    # if hasattr(loss, "apply_compile_strategy"):
+    #     loss = loss.apply_compile_strategy(backend=backend)
+    # else:
+    #     loss = torch.compile(loss, backend=backend)
 
     return loss

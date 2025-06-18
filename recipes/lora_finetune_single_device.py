@@ -595,6 +595,10 @@ class LoRAFinetuneRecipeSingleDevice(FTRecipeInterface):
                 self._dataloader.sampler.set_epoch(curr_epoch)
                 for idx, batch in enumerate(self._dataloader):
                     # Start tracking CUDA memory for active steps for just the first epoch
+
+                    if idx == 10:
+                        t0_new = time.perf_counter()
+
                     if (
                         curr_epoch == 0
                         and self.profiler_profile_memory
@@ -687,6 +691,8 @@ class LoRAFinetuneRecipeSingleDevice(FTRecipeInterface):
                     ) == self.max_steps_per_epoch:
                         break
 
+                t1_new = time.perf_counter()
+                print("Time taken for 10 batches: ", t1_new - t0_new)
                 self.epochs_run += 1
                 start_save_checkpoint = time.perf_counter()
                 self._logger.info("Starting checkpoint save...")
